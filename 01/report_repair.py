@@ -1,4 +1,9 @@
+import time 
 import itertools
+
+begin = time.time() 
+
+###
 
 def getSummands(l: list, result: int, n_summands: int) -> tuple:
 	for tup in itertools.combinations(l, n_summands):
@@ -13,3 +18,8 @@ print(f"Part 1: {a*b}")
 
 a, b, c = getSummands(numbers, result=2020, n_summands=3)
 print(f"Part 2: {a*b*c}")
+
+###
+
+end = time.time()
+print(f"Runtime: {end - begin}")
