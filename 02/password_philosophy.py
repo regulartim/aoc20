@@ -1,5 +1,4 @@
 import time
-import itertools
 
 begin = time.time()
 
@@ -38,4 +37,4 @@ print(f"Part 2: {part2}")
 ###
 
 end = time.time()
-print(f"Runtime: {end - begin}") 
+print(f"Runtime: {end - begin}")
