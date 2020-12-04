@@ -5,6 +5,17 @@ begin = time.time()
 
 ###
 
+def readFile(file) -> str:
+	result = ""
+	for line in file:
+		if line == "\n":
+			yield result
+			result = ""
+		else:
+			result += line
+	yield result
+
+
 def isComplete(passport: dict) -> bool:
 	if len(passport) == 8:
 		return True
@@ -13,6 +24,7 @@ def isComplete(passport: dict) -> bool:
 		return True
 
 	return False
+
 
 def isValid(passport: dict) -> bool:
 	if not 1920 <= int(passport["byr"]) <= 2002:
@@ -47,7 +59,7 @@ def isValid(passport: dict) -> bool:
 
 passports = []
 with open("input.txt") as input_file:
-	for record in input_file.read().split("\n\n"):
+	for record in readFile(input_file):
 		p = dict()
 		for field in record.split():
 			k, v = field.split(":")
