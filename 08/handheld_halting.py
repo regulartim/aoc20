@@ -10,12 +10,26 @@ class console:
 		self.prog = prog
 		self.length = len(prog)
 
-		self.acc = 0
+		self.accumulator = 0
 		self.pos = 0
 		self.visited = set()
 
 		self.halt = False
 		self.term = False
+
+
+	def acc(self, v: int) -> None:
+		self.accumulator += v
+		self.jmp(1)
+
+
+	def jmp(self, v: int) -> None:
+		self.pos += v
+
+
+	def nop(self, v: int) -> None:
+		self.jmp(1)
+
 
 	def execute(self) -> None:
 
@@ -32,18 +46,7 @@ class console:
 			self.visited.add(self.pos)
 
 			mode, value = self.prog[self.pos]
-
-			if mode == "acc":
-				self.acc += value
-				self.pos += 1
-				continue
-
-			if mode == "jmp":
-				self.pos += value
-				continue
-
-			if mode == "nop":
-				self.pos += 1
+			getattr(self, mode)(value)
 
 
 with open("input.txt") as input_file:
@@ -52,7 +55,7 @@ with open("input.txt") as input_file:
 
 c = console(instructions)
 c.execute()
-part1 = c.acc
+part1 = c.accumulator
 
 interchange = {"jmp", "nop"}
 for idx, instr in enumerate(instructions):
@@ -71,7 +74,7 @@ for idx, instr in enumerate(instructions):
 
 
 print(f"Part 1: {part1}")
-print(f"Part 2: {c.acc}")
+print(f"Part 2: {c.accumulator}")
 
 ###
 
