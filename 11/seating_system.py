@@ -53,11 +53,11 @@ def getNextState(d: dict, part2: bool) -> dict:
 	}
 
 
-def hasStabilised(system: list) -> bool:
-	if len(system) < 5:
+def hasStabilised(history: list) -> bool:
+	if len(history) < 2:
 		return False
 
-	if len(set(system[-5:])) > 1:
+	if len(set(history[-2:])) > 1:
 		return False
 
 	return True
