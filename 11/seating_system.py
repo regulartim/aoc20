@@ -16,31 +16,36 @@ neighbourhood = {(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)}
 
 def getAdjacents(point: tuple, floor: set, part2: bool) -> list:
 	if not part2:
-		for a, b in neighbourhood:
-			yield (point[0]+a, point[1]+b)
+		return [(point[0]+a, point[1]+b) for a, b in neighbourhood]
 
-	else:
-		for a, b in neighbourhood:
-			neighbour = (point[0]+a, point[1]+b)
-			while neighbour in floor:
-				neighbour = (neighbour[0]+a, neighbour[1]+b)
-			yield neighbour
+	res = []
+	for a, b in neighbourhood:
+		neighbour = (point[0]+a, point[1]+b)
+		while neighbour in floor:
+			neighbour = (neighbour[0]+a, neighbour[1]+b)
+		res.append(neighbour)
+	return res
 
 
-def getNextState(d: dict, part2: bool) -> dict:
+def buildAdjMap(d: dict, part2: bool) -> dict:
+	seats = d["empty"]
+	return {seat: getAdjacents(seat, d["floor"], part2) for seat in seats}
+
+
+def getNextState(d: dict, adjacencies: dict, part2: bool) -> dict:
 	empty, occupied = set(), set()
+
 	for seat in d["empty"]:
-		for a in getAdjacents(seat, d["floor"], part2):
+		for a in adjacencies[seat]:
 			if a in d["occupied"]:
 				empty.add(seat)
 				break
 		else:
 			occupied.add(seat)
 
-	occ_threshold = 5 if part2 else 4
 	for seat in d["occupied"]:
-		occ_adjacents = [a for a in getAdjacents(seat, d["floor"], part2) if a in d["occupied"]]
-		if len(occ_adjacents)  < occ_threshold:
+		occupied_adjacents = [a for a in adjacencies[seat] if a in d["occupied"]]
+		if len(occupied_adjacents) < (5 if part2 else 4):
 			occupied.add(seat)
 		else:
 			empty.add(seat)
@@ -72,16 +77,13 @@ with open("input.txt") as input_file:
 			if char == "L":
 				seat_map["empty"].add(pos)
 
-p1 = seat_map
-while not hasStabilised(p1["history"]):
-	p1 = getNextState(p1, part2=False)
+for part in (1, 2):
+	state = seat_map
+	adjacency_map = buildAdjMap(seat_map, part2=(part==2))
 
-p2 = seat_map
-while not hasStabilised(p2["history"]):
-	p2 = getNextState(p2, part2=True)
-
-print(f"Part 1: {p1['history'][-1]}")
-print(f"Part 2: {p2['history'][-1]}")
+	while not hasStabilised(state["history"]):
+		state = getNextState(state, adjacency_map, part2=(part==2))
+	print(f"Part {part}: {state['history'][-1]}")
 
 ###
 
