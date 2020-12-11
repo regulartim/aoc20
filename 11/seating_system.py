@@ -16,16 +16,15 @@ neighbourhood = {(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)}
 
 def getAdjacents(point: tuple, floor: set, part2: bool) -> list:
 	if not part2:
-		return [(point[0]+x, point[1]+y) for x,y in neighbourhood]
+		for a, b in neighbourhood:
+			yield (point[0]+a, point[1]+b)
 
-	res = list()
-	for a, b in neighbourhood:
-		neighbour = (point[0]+a, point[1]+b)
-		while neighbour in floor:
-			neighbour = (neighbour[0]+a, neighbour[1]+b)
-		res.append(neighbour)
-
-	return res
+	else:
+		for a, b in neighbourhood:
+			neighbour = (point[0]+a, point[1]+b)
+			while neighbour in floor:
+				neighbour = (neighbour[0]+a, neighbour[1]+b)
+			yield neighbour
 
 
 def getNextState(d: dict, part2: bool) -> dict:
