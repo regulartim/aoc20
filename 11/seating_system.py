@@ -1,5 +1,4 @@
 import time
-import copy 
 
 begin = time.time()
 
@@ -15,16 +14,16 @@ seat_map = {
 neighbourhood = {(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)}
 
 
-def getAdjacents(point: tuple, floor: set, part2: bool) -> set:
+def getAdjacents(point: tuple, floor: set, part2: bool) -> list:
 	if not part2:
-		return {(point[0]+x, point[1]+y) for x,y in neighbourhood}
+		return [(point[0]+x, point[1]+y) for x,y in neighbourhood]
 
-	res = set()
-	for x, y in neighbourhood:
-		neighbour = (point[0]+x, point[1]+y)
+	res = list()
+	for a, b in neighbourhood:
+		neighbour = (point[0]+a, point[1]+b)
 		while neighbour in floor:
-			neighbour = (neighbour[0]+x, neighbour[1]+y)
-		res.add(neighbour)
+			neighbour = (neighbour[0]+a, neighbour[1]+b)
+		res.append(neighbour)
 
 	return res
 
@@ -74,7 +73,6 @@ with open("input.txt") as input_file:
 			if char == "L":
 				seat_map["empty"].add(pos)
 
-#clone = copy.deepcopy(seat_map)
 p1 = seat_map
 while not hasStabilised(p1["history"]):
 	p1 = getNextState(p1, part2=False)
@@ -85,7 +83,7 @@ while not hasStabilised(p2["history"]):
 
 print(f"Part 1: {p1['history'][-1]}")
 print(f"Part 2: {p2['history'][-1]}")
-#print(len(clone['history']))
+
 ###
 
 end = time.time()
