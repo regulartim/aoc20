@@ -47,11 +47,12 @@ def getNextState(d: dict, part2: bool) -> dict:
 		else:
 			empty.add(seat)
 
-	d["empty"] = empty
-	d["occupied"] = occupied
-	d["history"].append(len(occupied))
-
-	return d
+	return {
+		"floor": d["floor"],
+		"empty": empty,
+		"occupied": occupied,
+		"history": d["history"] + [len(occupied)]
+	}
 
 
 def hasStabilised(system: list) -> bool:
@@ -73,16 +74,18 @@ with open("input.txt") as input_file:
 			if char == "L":
 				seat_map["empty"].add(pos)
 
-clone = copy.deepcopy(seat_map)
-while not hasStabilised(seat_map["history"]):
-	seat_map = getNextState(seat_map, part2=False)
+#clone = copy.deepcopy(seat_map)
+p1 = seat_map
+while not hasStabilised(p1["history"]):
+	p1 = getNextState(p1, part2=False)
 
-while not hasStabilised(clone["history"]):
-	clone = getNextState(clone, part2=True)
+p2 = seat_map
+while not hasStabilised(p2["history"]):
+	p2 = getNextState(p2, part2=True)
 
-print(f"Part 1: {seat_map['history'][-1]}")
-print(f"Part 2: {clone['history'][-1]}")
-
+print(f"Part 1: {p1['history'][-1]}")
+print(f"Part 2: {p2['history'][-1]}")
+#print(len(clone['history']))
 ###
 
 end = time.time()
