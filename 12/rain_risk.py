@@ -12,24 +12,21 @@ DIRECTIONS = {
 }
 
 
-def move(point: tuple, di: int, instr: tuple) -> tuple:
+def movePoint(point: tuple, movement: tuple, factor: int) -> tuple:
+	point_x, point_y = point
+	move_x, move_y = movement
+	point = point_x + move_x*factor, point_y + move_y*factor
+	return point
+
+
+def rotateShip(di: int, instr: tuple) -> int:
 	action, v = instr
-
-	if action in "NSWEF":
-		x, y = DIRECTIONS[action] if action != "F" else list(DIRECTIONS.values())[di]
-		curr_x, curr_y = point
-		point = (curr_x+x*v, curr_y+y*v)
-
-	else:
-		idx_change = v//90
-		new_dir = di + (idx_change if action == "R" else -idx_change)
-		di = new_dir % 4
-
-	return point, di
+	idx_change = v//90
+	di = di + (idx_change if action == "R" else -idx_change)
+	return di % 4
 
 
-def rotate(point: tuple, instr: tuple) -> tuple:
-
+def rotateWaypoint(point: tuple, instr: tuple) -> tuple:
 	x, y = point
 	action, v = instr
 	steps = v//90
@@ -43,19 +40,34 @@ def rotate(point: tuple, instr: tuple) -> tuple:
 	return x, y
 
 
-def moveWaypoint(point: tuple, instr) -> tuple:
-	action, _ = instr
+def changeWaypoint(point: tuple, instr) -> tuple:
+	action, v = instr
 	if action in "LR":
-		return rotate(point, instr)
-	return move(point, 0, instr)[0]
+		return rotateWaypoint(point, instr)
+
+	movement = DIRECTIONS[action]
+	return movePoint(point, movement, v)
 
 
-def movePartTwo(point: tuple, wp: tuple, instr: tuple) -> tuple:
+def navigate1(point: tuple, di: int, instr: tuple) -> tuple:
+	action, v = instr
+
+	if action in "NSWEF":
+		movement = DIRECTIONS[action] if action != "F" else list(DIRECTIONS.values())[di]
+		point = movePoint(point, movement, v)
+
+	else:
+		di = rotateShip(di, instr)
+
+	return point, di
+
+
+def navigate2(point: tuple, wp: tuple, instr: tuple) -> tuple:
 	action, v = instr
 	if action == "F":
-		point = (point[0] + wp[0]*v), (point[1] + wp[1]*v)
+		point = movePoint(point, wp, v)
 	else:
-		wp = moveWaypoint(wp, instr)
+		wp = changeWaypoint(wp, instr)
 
 	return point, wp
 
@@ -72,8 +84,8 @@ direction = 0
 waypoint = (10,1)
 
 for i in instructions:
-	p1_position, direction = move(p1_position, direction, i)
-	p2_position, waypoint = movePartTwo(p2_position, waypoint, i)
+	p1_position, direction = navigate1(p1_position, direction, i)
+	p2_position, waypoint = navigate2(p2_position, waypoint, i)
 
 
 print(f"Part 1: {manhattanDistance(p1_position)}")
