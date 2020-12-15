@@ -13,20 +13,19 @@ def calculateNthNumber(n: int, numbers: list) -> int:
 	for idx, num in enumerate(numbers):
 		d[num] = [idx]
 
+	number = numbers[-1]
 	for turn in range(len(numbers), n):
 
-		number = numbers[-1]
 		spoken_in_turns = d[number]
 
 		if len(spoken_in_turns) < 2:
-			res = 0
+			number = 0
 		else:
-			res = spoken_in_turns[-1] - spoken_in_turns[-2]
+			number = spoken_in_turns[-1] - spoken_in_turns[-2]
 
-		numbers.append(res)
-		d.setdefault(res,[]).append(turn)
+		d.setdefault(number,[]).append(turn)
 
-	return numbers[-1]
+	return number
 
 
 print(f"Part 1: {calculateNthNumber(2020,starting_numbers)}")
