@@ -18,11 +18,9 @@ def calculateNthNumber(n: int, numbers: list) -> int:
 
 		has_been_spoken = number in d
 		last_spoken = d.get(number, 0)
-		
+
 		d[number] = turn-1
 		number = (turn-1) - last_spoken	if has_been_spoken else 0
-
-			
 
 	return number
 
