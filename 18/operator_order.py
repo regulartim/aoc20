@@ -33,32 +33,14 @@ def solveInner(eq: list, same_precedence: bool) -> list:
 
 
 def doOperation(eq: list, add=True, mul=True) -> list:
-	res = list()
-	skip = 0
-	changed = False
-
 	for idx, elem in enumerate(eq):
-		if skip > 0:
-			skip -= 1
+		a, b, c = elem, eq[idx+1], eq[idx+2]
+		if not(isinstance(a, int) and isinstance(c, int)):
 			continue
-
-		if not changed:
-			a, b, c = elem, eq[idx+1], eq[idx+2]
-
-			if add and isinstance(a, int) and b in "+" and isinstance(c, int):
-				res.append(a+c)
-				changed = True
-			if mul and isinstance(a, int) and b in "*" and isinstance(c, int):
-				res.append(a*c)
-				changed = True
-
-			if changed:
-				skip = 2
-				continue
-
-		res.append(elem)
-
-	return res
+		if add and b == "+":
+			return eq[:idx] + [a+c] + eq[idx+3:]
+		if mul and b == "*":
+			return eq[:idx] + [a*c] + eq[idx+3:]
 
 
 def solve(eq: list, same_precedence: bool) -> int:
