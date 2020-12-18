@@ -1,5 +1,4 @@
 import time
-import itertools
 
 begin = time.time()
 
