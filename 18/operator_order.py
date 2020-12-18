@@ -20,64 +20,8 @@ def makeEquation(l: list) -> list:
 		res += [elem] + tmp
 	return res
 
-def solve(eqation: list, part2=False) -> int:
-	res = list()
-	skip = 0
-	changed = False
 
-	for idx, elem in enumerate(eqation):
-		if skip > 0:
-			skip -= 1
-			continue
-
-		if not changed:
-			try:
-				a, b, c = elem, eqation[idx+1], eqation[idx+2]
-				if a == "(" and c == ")":
-					res.append(b)
-					skip = 2
-					changed = True
-					continue
-
-				if isinstance(a, int) and b in "+" and isinstance(c, int):
-					res.append(a+c)
-					skip = 2
-					changed = True
-					continue
-
-				if not part2 and isinstance(a, int) and b in "*" and isinstance(c, int):
-					res.append(a*c)
-					skip = 2
-					changed = True
-					continue
-			except:
-				pass
-		res.append(elem)
-	
-	if part2 and not changed:
-		res = list()
-		skip = 0
-		for idx, elem in enumerate(eqation):
-			if skip > 0:
-				skip -= 1
-				continue
-			if not changed:
-				a, b, c = elem, eqation[idx+1], eqation[idx+2]
-				if isinstance(a, int) and b in "*" and isinstance(c, int):
-					res.append(a*c)
-					skip = 2
-					changed = True
-					continue
-			res.append(elem)
-
-		
-	#print(res)
-	if len(res) > 1:
-		return solve(res, part2)
-
-	return res[0]
-
-def solveInner(eq):
+def solveInner(eq: list, same_precedence: bool) -> list:
 	for idx, char in enumerate(eq):
 		if char == "(":
 			start = idx
@@ -85,10 +29,11 @@ def solveInner(eq):
 			stop = idx
 			break
 	inner = eq[start+1:stop]
-	res = solveOuter(inner)
+	res = solve(inner, same_precedence)
 	return eq[:start] + [res] + eq[stop+1:]
 
-def doAddition(eq):
+
+def doOperation(eq: list, add=True, mul=True) -> list:
 	res = list()
 	skip = 0
 	changed = False
@@ -100,58 +45,46 @@ def doAddition(eq):
 
 		if not changed:
 			a, b, c = elem, eq[idx+1], eq[idx+2]
-			if isinstance(a, int) and b in "+" and isinstance(c, int):
+
+			if add and isinstance(a, int) and b in "+" and isinstance(c, int):
 				res.append(a+c)
-				skip = 2
 				changed = True
-				continue
-
-		res.append(elem)
-	return res
-
-def doMultiplication(eq):
-	res = list()
-	skip = 0
-	changed = False
-
-	for idx, elem in enumerate(eq):
-		if skip > 0:
-			skip -= 1
-			continue
-
-		if not changed:
-			a, b, c = elem, eq[idx+1], eq[idx+2]
-			if isinstance(a, int) and b in "*" and isinstance(c, int):
+			if mul and isinstance(a, int) and b in "*" and isinstance(c, int):
 				res.append(a*c)
-				skip = 2
 				changed = True
+
+			if changed:
+				skip = 2
 				continue
 
 		res.append(elem)
+
 	return res
 
-def solveOuter(eq: list):
+
+def solve(eq: list, same_precedence: bool) -> int:
 	while "(" in eq:
-		eq = solveInner(eq)
-	while "+" in eq:
-		eq = doAddition(eq)
-	while "*" in eq:
-		eq = doMultiplication(eq)
+		eq = solveInner(eq, same_precedence)
+
+	if same_precedence:
+		while "+" in eq or "*" in eq:
+			eq = doOperation(eq)
+	else:
+		while "+" in eq:
+			eq = doOperation(eq, mul=False)
+		while "*" in eq:
+			eq = doOperation(eq, add=False)
+
 	return eq[0]
-
-
-
 
 
 with open("input.txt") as input_file:
 	lines = [line.strip().split() for line in input_file]
 
 eqations = [makeEquation(line) for line in lines]
-solutions = [solveOuter(e) for e in eqations]
 
-
-print(f"Part 1: {sum([solve(e) for e in eqations])}")
-print(f"Part 2: {sum([solveOuter(e) for e in eqations])}")
+print(f"Part 1: {sum([solve(e, same_precedence=True) for e in eqations])}")
+print(f"Part 2: {sum([solve(e, same_precedence=False) for e in eqations])}")
 
 ###
 
