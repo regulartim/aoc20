@@ -10,7 +10,7 @@ def getRemainderById(message: str, rule_id: str):
 			yield message[1:]
 
 	else:
-		for rule in RULES[rule_id]: # try each of the alternatives
+		for rule in RULES[rule_id]:
 			yield from getRemainderBySeqence(message, rule)
 
 
