@@ -4,29 +4,28 @@ begin = time.time()
 
 ###
 
-def getPermutations(rule_id: str) -> set:
-	res = set()
+def getRemainderById(message: str, rule_id: str):
+	if isinstance(RULES[rule_id], str):
+		if message and message[0] == RULES[rule_id]:
+			yield message[1:]
 
-	rule = RULES[rule_id]
-	if isinstance(rule, str):
-		return set(rule)
+	else:
+		for rule in RULES[rule_id]: # try each of the alternatives
+			yield from getRemainderBySeqence(message, rule)
 
-	for tup in rule:
-		perm = getPermutations(tup[0])
-		for i in tup[1:]:
-			tmp = set()
-			for elem in getPermutations(i):
-				for p in perm:
-					s = p + elem
-					tmp.add(s)
 
-			perm = tmp
+def getRemainderBySeqence(message: str, sequence: tuple):
+	if not sequence:
+		yield message
 
-		res.update(perm)
-	return res
+	else:
+		for remainder in getRemainderById(message, sequence[0]):
+			yield from getRemainderBySeqence(remainder, sequence[1:])
 
-def matches(message: str, rule_id: str) -> bool:
-	return message in getPermutations(rule_id)
+
+def match(message: str, rule_id: str) -> bool:
+	return "" in getRemainderById(message, rule_id)
+
 
 with open("input.txt") as input_file:
 	blocks = input_file.read().split("\n\n")
@@ -46,19 +45,17 @@ for line in blocks[0].split("\n"):
 
 	RULES[key] = value
 
-messages = [line for line in blocks[1].split("\n")[:-1]]
+messages = blocks[1].split("\n")[:-1]
+matching_messages = [m for m in messages if match(m, "0")]
 
-
-permutations = getPermutations("0")
-print(f"Part 1: {len([m for m in messages if m in permutations])}")
-
-
-exit()
+print(f"Part 1: {len(matching_messages)}")
 
 RULES["8"].append(("42","8"))
 RULES["11"].append(("42","11","31"))
-permutations = getPermutations("0")
-print(f"Part 2: {len([m for m in messages if m in permutations])}")
+
+matching_messages = [m for m in messages if match(m, "0")]
+
+print(f"Part 2: {len(matching_messages)}")
 
 ###
 
