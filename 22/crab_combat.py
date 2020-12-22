@@ -12,36 +12,33 @@ def oneIsEmpty(lists: list) -> bool:
 
 
 def calculateScore(l: list) -> int:
-	factor = 1
-	res = 0
-	for n in reversed(l):
-		res += n * factor
-		factor += 1
-	return res
+	return sum([idx * n for idx, n in enumerate(reversed(l) ,1)])
 
 
-def getRoundId(decks):
+def getRoundId(decks: list) -> str:
 	res = str()
 	for d in decks:
 		res += str(d)
 	return res
 
 
-def normalCombat(decks):
+def normalCombat(decks: list) -> tuple:
 	while not oneIsEmpty(decks):
 		cards = [d.popleft() for d in decks]
 		winner = 0 if cards[0] > cards[1] else 1
 		decks[winner].append(cards.pop(winner))
 		decks[winner].append(cards.pop(0))
-	return winner, calculateScore(decks[winner])
+	return winner, decks[winner]
 
 
-def recursiveCombat(decks):
+def recursiveCombat(decks: list) -> tuple:
 	previous = set()
 	while not oneIsEmpty(decks):
+
 		roundId = getRoundId(decks)
 		if roundId in previous:
-			return 0, calculateScore(decks[0])
+			return 0, decks[0]
+
 		previous.add(roundId)
 
 		cards = [d.popleft() for d in decks]
@@ -56,7 +53,7 @@ def recursiveCombat(decks):
 		decks[winner].append(cards.pop(winner))
 		decks[winner].append(cards.pop(0))
 
-	return winner, calculateScore(decks[winner])
+	return winner, decks[winner]
 
 
 with open("input.txt") as input_file:
@@ -70,10 +67,10 @@ for block in blocks:
 			deck.append(int(line))
 	player_decks.append(deck)
 
-copy = copy.deepcopy(player_decks)
+decks_copy = copy.deepcopy(player_decks)
 
-print(f"Part 1: {normalCombat(player_decks)[1]}")
-print(f"Part 2: {recursiveCombat(copy)[1]}")
+print(f"Part 1: {calculateScore(normalCombat(player_decks)[1])}")
+print(f"Part 2: {calculateScore(recursiveCombat(decks_copy)[1])}")
 
 ###
 
