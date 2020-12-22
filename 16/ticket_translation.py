@@ -15,10 +15,10 @@ def isInSingleInterval(n: int, interval: tuple) -> bool:
 	return a <= n <= b
 
 def isInIntervals(n: int, intervals: list) -> bool:
-	return True in (isInSingleInterval(n, i) for i in intervals)
+	return any(isInSingleInterval(n, i) for i in intervals)
 
 def isValidNumber(n: int) -> bool:
-	return True in (isInIntervals(n, intervals) for intervals in FIELDS.values())
+	return any(isInIntervals(n, intervals) for intervals in FIELDS.values())
 
 def findInvalidNumbers(ticket: list) -> list:
 	return [n for n in ticket if not isValidNumber(n)]
