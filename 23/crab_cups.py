@@ -5,7 +5,6 @@ begin = time.time()
 
 ###
 
-RAW_INPUT = "389125467"
 RAW_INPUT = "789465123"
 
 
@@ -61,12 +60,16 @@ class circularlist:
 	def isEmpty(self):
 		return self.current is None
 
+	def append(self, value):
+		self.insert(value, self.last.value)
 
+	def maxValue(self) -> int:
+		return max(self.lookup.keys())
 
 
 def play(cups: circularlist, moves: int) -> list:
 
-	highest_value = 9
+	highest_value = cups.maxValue()
 
 	for _ in range(moves):
 
@@ -79,16 +82,13 @@ def play(cups: circularlist, moves: int) -> list:
 		while destination in pick_up:
 			destination = destination -1 if destination > 1 else highest_value
 
-		#destination_idx = cups.index(destination)
-
 		for p in reversed(pick_up):
 			cups.insert(p, behind=destination)
-
 
 	return cups
 
 
-def getResultString(q: list) -> str:
+def getResultString(q: circularlist) -> str:
 	while q.current.value != 1:
 		q.rotate(1)
 
@@ -99,24 +99,24 @@ def getResultString(q: list) -> str:
 	return res[1:]
 
 
-def getP2Result(q: list) -> int:
-	while q[0] != 1:
+def getP2Result(q: circularlist) -> int:
+	while q.current.value != 1:
 		q.rotate(1)
 
-	return q[1] * q[2]
+	return q.current.next_node.value * q.current.next_node.next_node.value
 
 
 cup_list_p1 = circularlist([int(n) for n in RAW_INPUT])
-#cup_list_p2 = deque([int(n) for n in RAW_INPUT])
+cup_list_p2 = circularlist([int(n) for n in RAW_INPUT])
 
-#for i in range(len(cup_list_p2), 1000000):
-#	cup_list_p2.append(i+1)
+for i in range(9, 1000000):
+	cup_list_p2.append(i+1)
 
 cup_list_p1 = play(cup_list_p1, moves=100)
-#cup_list_p2 = play(cup_list_p2, moves=100)
+cup_list_p2 = play(cup_list_p2, moves=10000000)
 
 print(f"Part 1: {getResultString(cup_list_p1)}")
-#print(f"Part 2: {getP2Result(cup_list_p2)}")
+print(f"Part 2: {getP2Result(cup_list_p2)}")
 
 ###
 
